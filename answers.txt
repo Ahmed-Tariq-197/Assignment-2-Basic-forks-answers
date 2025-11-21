@@ -1,0 +1,173 @@
+CSE233 - Operating Systems
+Assignment 2: Basic Forks and C Style Development
+Student: Ahmed Tariq
+
+===============================================================================
+ANSWERS TO ASSIGNMENT QUESTIONS
+===============================================================================
+
+QUESTION 1: Explain each code example and what it does
+-------------------------------------------------------
+
+Exercise 1: process_creation.c
+-------------------------------
+This program demonstrates the fork() system call.
+
+What it does:
+- fork() creates a new process by duplicating the parent process
+- Returns 0 to child process, returns child's PID to parent
+- Both processes run the same code after fork()
+- We use the return value to identify which process is running
+
+How it works:
+1. Program starts with one process (parent)
+2. fork() is called
+3. Now two processes exist (parent and child)
+4. Parent gets child's PID, child gets 0
+5. Each process executes its respective code block
+
+Real-world usage:
+- Web servers fork to handle multiple clients
+- Shell programs fork to run commands
+- Creating parallel processes for computation
+
+
+Exercise 5: file1.c and file2.c
+--------------------------------
+These files demonstrate how the linker combines multiple source files.
+
+What it does:
+- file1.c contains function implementations (hello, etc.)
+- file2.c contains main() and calls functions from file1.c
+- Each file compiles separately into an object file (.o)
+- Linker combines both object files into one executable
+
+How it works:
+1. file1.c compiled to file1.o
+2. file2.c compiled to file2.o
+3. Linker resolves external references
+4. Creates final executable
+
+This demonstrates modular programming and separate compilation.
+
+
+Exercise 6: simple_program.c
+-----------------------------
+This program demonstrates how the loader works.
+
+What it does:
+- Simple program that uses standard library functions
+- When executed, the loader loads it into memory
+- Also loads required shared libraries (like libc.so)
+- Use 'ldd simple_program' to see which libraries are loaded
+
+How it works:
+1. Loader reads executable file
+2. Allocates memory for the process
+3. Loads shared libraries
+4. Resolves dynamic symbols
+5. Starts program execution
+
+
+===============================================================================
+QUESTION 2: What is the job of the Linker?
+===============================================================================
+
+The linker combines multiple object files and libraries into a single 
+executable program. It works at COMPILE TIME.
+
+Main jobs:
+
+1. SYMBOL RESOLUTION
+   - Matches function calls to their implementations
+   - Example: hello() call in file2.c → hello() definition in file1.c
+   - Reports errors if symbols are undefined
+
+2. RELOCATION
+   - Assigns final memory addresses to code and data
+   - Updates all references to use correct addresses
+   - Combines code sections from multiple files
+
+3. LIBRARY LINKING
+   - Links with static libraries (copies code into executable)
+   - Records dynamic library dependencies (loaded at runtime)
+
+4. COMBINING OBJECT FILES
+   - Takes multiple .o files as input
+   - Produces single executable file
+   - Resolves cross-references between files
+
+Example:
+gcc -c file1.c -o file1.o    # Compile to object file
+gcc -c file2.c -o file2.o    # Compile to object file
+gcc file1.o file2.o -o prog  # Link object files → executable
+
+
+===============================================================================
+QUESTION 3: What is the job of the Loader?
+===============================================================================
+
+The loader loads an executable program into memory and prepares it for 
+execution. It works at RUN TIME.
+
+Main jobs:
+
+1. READING EXECUTABLE
+   - Opens the executable file (ELF format on Linux)
+   - Verifies format and permissions
+
+2. MEMORY ALLOCATION
+   - Creates memory segments for the process:
+     * Text segment (program code)
+     * Data segment (initialized variables)
+     * BSS segment (uninitialized variables)
+     * Stack (function calls, local variables)
+     * Heap (dynamic memory allocation)
+
+3. LOADING CODE AND DATA
+   - Copies code from file into memory
+   - Initializes data segments
+   - Sets up proper memory permissions
+
+4. LOADING SHARED LIBRARIES
+   - Loads required shared libraries (libc.so, etc.)
+   - Libraries are shared between multiple processes
+   - View with: ldd simple_program
+
+5. DYNAMIC LINKING
+   - Resolves addresses of library functions
+   - Updates references to match actual locations
+   - Process called "symbol binding"
+
+6. PROCESS INITIALIZATION
+   - Sets up initial stack
+   - Initializes registers
+   - Transfers control to program entry point
+
+Example output of 'ldd simple_program':
+    linux-vdso.so.1 => (virtual library)
+    libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6
+    /lib64/ld-linux-x86-64.so.2 => loader itself
+
+
+===============================================================================
+KEY DIFFERENCES: Linker vs Loader
+===============================================================================
+
+LINKER:
+- Works at compile time
+- Input: Object files (.o)
+- Output: Executable file
+- Combines multiple files
+- Resolves static symbols
+
+LOADER:
+- Works at run time
+- Input: Executable file
+- Output: Process in memory
+- Loads program into RAM
+- Resolves dynamic symbols
+
+===============================================================================
+End of Answers
+===============================================================================
